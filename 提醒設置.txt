@@ -1,0 +1,43 @@
+const NotifyToken　=　"你的Line Notify 權杖";   // Line Notify 權杖  
+var CalendarID = "你的日曆 ID";   // 月曆 ID
+var calendar = CalendarApp.getCalendarById(CalendarID);
+var a=0;
+const Now = new Date();
+const Start = new Date(new Date().setHours(0, 0, 0, 0));
+const End= new Date(Now.getFullYear(), 12, 31, 23, 59, 59, 999);
+const d = Number(Now.getDate())
+const tomorrow =new Date(Now.getFullYear(), Number(Now.getMonth()), d+1, 0, 0, 0, 0)
+const compare =new Date(Now.getFullYear(), Number(Now.getMonth()), d+1, 23, 59, 59, 999)
+var calendarData = calendar.getEvents(Start, End);
+
+function Notify() {
+  var NotifyContents = "\n明天要幹嘛";
+  calendarData.forEach(item =>{
+       if (tomorrow <= item.getStartTime() && compare > item.getStartTime() ) {
+          a++;
+        NotifyContents += (item.getTitle() != "") ? ("\n" + item.getTitle()  ) : ("\n空標題");
+        NotifyContents += (item.getDescription() != "") ? item.getDescription() : "";
+      }
+    }
+  )
+  if(a==0){
+ 
+}else{
+  if(Number(Now.getDay()) ==5 	|| (Number(Now.getDay())==6)){	
+    }else{
+      sendLineNotify(NotifyContents, NotifyToken);
+  }
+
+
+
+}
+}
+function sendLineNotify(NotifyContents,NotifyToken){
+  var options =
+   {
+     "method"  : "post",
+     "payload" : {"message" : NotifyContents},
+     "headers" : {"Authorization" : "Bearer " + NotifyToken}
+   };
+   UrlFetchApp.fetch("https://notify-api.line.me/api/notify", options);
+}
