@@ -1,5 +1,4 @@
 - 👋 Hi, I’m @yue
-- 我是個快樂的高中生會寫一些c++ JAVASCRIPT  arduino
-- 一定要讀那兩個HTML檔喔
--感謝同學讓我測試
- 
+#我的lineBot集
+-裡面皆在google apps script上部署
+-所以我的程式媽都給txt檔 請見諒🙇
