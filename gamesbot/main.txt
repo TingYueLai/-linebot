@@ -1,0 +1,119 @@
+  var name= [' ','剪刀','石頭','布'];
+  var number=[0,3,1,2,];
+  var who;
+function doPost(e){
+  var SpreadSheet = SpreadsheetApp.openById("尼的googlesheet");
+  var sheet = SpreadSheet.getSheetByName("工作表1");
+  var lastColumn = sheet.getLastColumn();
+  var lastRow = sheet.getLastRow();
+  var sheetData = sheet.getSheetValues(1, 1, lastRow, lastColumn);
+  var CHANNEL_ACCESS_TOKEN = '尼的token';
+  var msg= JSON.parse(e.postData.contents);
+  Logger.log(msg);
+  console.log(msg);
+  var replyToken = msg.events[0].replyToken;
+  var userMessage = msg.events[0].message.text;
+  if (typeof replyToken === 'undefined') {
+    return;
+  };
+  var answer =Number(sheetData[[0]][0]);
+  var mode = Number(sheetData[[0]][1]);
+  var message ="";
+  
+
+  
+
+  
+  if(userMessage=="!清空"){
+  message ="待機中";
+  mode=0;
+  sheet.getRange(1,2).setValue(0);
+  }
+  if(userMessage=="!help"){
+  message +="!清空，進入待機模式"+"\n";
+  message +="!終極密碼，進入模式"+"\n";
+  message +="!剪刀時頭布，進入模式"+"\n";
+  message +="!抽數字，會抽出數字範圍1~100"+"\n";
+  message +="!RPG，進入RPG模式"+"\n";
+  mode=0;
+  sheet.getRange(1,2).setValue(0);
+  }
+  
+  
+  if(mode==0){
+    if(userMessage=="賣掉") message+="道義";
+    else message+="超級啾啾";
+  }  
+  if(mode==2){
+    for(i=0;i<4;i++){
+    if(userMessage==name[i]) {
+      who=Number(i);
+    }
+  }
+var t=Math.ceil(Math.random()*3);
+t=Number(t);
+  
+  if(who==0){
+  message="油";
+  }else{
+  message=name[t]+"\n";
+  if(who==t){
+  message+="平手"
+  }else if(t==number[who]){
+  message+="你贏了";
+  }else{
+  message+="你輸了";
+  }  
+  }
+  }
+  if(mode==1){
+  if(Number(userMessage)==answer){
+  message ="你對了";
+  sheet.getRange(1,2).setValue(0);
+  }else if(Number(userMessage)<answer){
+  message ="太小了";
+  }else{
+  message ="太大了";
+  }
+  }
+  if(userMessage=="!剪刀石頭布"){
+  sheet.getRange(1,2).setValue(2);
+  message ="剪刀石頭布模式";
+  mode=2;
+  }
+
+  if(userMessage=="!終極密碼"){
+  var t;
+  mode=1;
+  t=Math.ceil(Math.random()*100);
+  t=Number(t);
+  sheet.getRange(1,1).setValue(t);
+  sheet.getRange(1,2).setValue(1);
+  message ="1到100選數字";
+  }
+  if(userMessage=="!抽數字"){
+  var t;
+  t=Math.ceil(Math.random()*100);
+  t=Number(t);
+  message =t;
+  }
+
+  var reply_message=[{
+      'type': 'text',
+      'text': message
+    }];
+  //回傳訊息給line 並傳送給使用者
+  var url = 'https://api.line.me/v2/bot/message/reply';
+  UrlFetchApp.fetch(url, {
+      'headers': {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+    },
+    'method': 'post',
+    'payload': JSON.stringify({
+      'replyToken': replyToken,
+      'messages': reply_message,
+    }),
+  });
+  return ContentService.createTextOutput("成功");
+} 
