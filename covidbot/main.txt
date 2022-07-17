@@ -1,0 +1,35 @@
+function doPost(){
+  var message ="這裡是文華確診地圖"+"\n"+"這是測試訊息，請收到訊息的人可以回我一下嗎ww??"+"\n"+"感謝各位大大。";
+/*
+  var message ="🗺文華確診地圖:https://whcsc.github.io/covidmap"+"\n"+"\n";
+      message +="😷目前校方公布在校確診人數：5人"+"\n";
+      message +="📅最新一日公布確診日期：5/2"+"\n";
+      message +="🏠已停課班級：209、212、216、219、310"+"\n";
+*/
+  var CHANNEL_ACCESS_TOKEN = '尼的TOKEN';
+  //當資料寫入完成後，回傳資訊
+  var reply_message=[{
+      'type': 'text',
+      'text': message
+    }];
+  //回傳訊息給line 並傳送給使用者
+  var url = 'https://api.line.me/v2/bot/message/broadcast';
+  UrlFetchApp.fetch(url, {
+      'headers': {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+    },
+    'method': 'post',
+    'payload': JSON.stringify({
+      'messages': reply_message,
+    }),
+  });
+  return ContentService.createTextOutput("成功");
+} 
+/*
+🗺文華確診地圖:https://whcsc.github.io/covidmap
+
+😷目前校方公布在校確診人數：5人
+📅最新一日公布確診日期：5/2
+🏠已停課班級：209、212、216、219、310
+*/

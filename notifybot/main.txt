@@ -1,0 +1,50 @@
+function myFunction(e) {
+  var token = "QItMadUN0FCse1vOec94GEuAh6R9CptEGFU878Y76Vi";// 
+  var SpreadSheet = SpreadsheetApp.getActive();
+  var sheet = SpreadSheet.getActiveSheet();
+  var lastColumn = sheet.getLastColumn();
+  var lastRow = sheet.getLastRow();
+  var sheetData = sheet.getSheetValues(1, 1, lastRow, lastColumn);
+  var today="";
+  var time="";
+  var day_list = ['日', '一', '二', '三', '四', '五', '六'];
+  var message ="\n";
+  today =new Date().getDay();
+  time=new Date().getHours();
+  message +="今天是星期"+ day_list[today] +"\n";   
+      if(today<6 && today>0){
+    if(time<10){
+      message +="早上要執勤的有"+ "\n";
+        for(var i=0;i<5;i++){
+    message +=sheetData[[0]][i];
+   message +=sheetData[[today]][i]+ "\n";
+    }
+    sendLineNotify(message, token);
+    }
+      else{
+            message +="下午要執勤的有"+ "\n";
+        for(var i=3;i<7;i++){
+    message +=sheetData[[0]][i];
+   message +=sheetData[[today]][i]+ "\n";
+    }  
+          for(var i=7;i<11;i++){
+    message +=sheetData[[0]][i]+ "\n";
+   message +=sheetData[[today]][i];
+    }     
+  sendLineNotify(message, token);
+    }
+    }else{
+  message +="今天無人需值勤"+ "\n";
+  message +="周末祝大家開心"+ "\n";
+ 
+  }  
+}
+function sendLineNotify(message, token){
+  var options =
+   {
+     "method"  : "post",
+     "payload" : {"message" : message},
+     "headers" : {"Authorization" : "Bearer " + token}
+   };
+   UrlFetchApp.fetch("https://notify-api.line.me/api/notify", options);
+}

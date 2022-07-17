@@ -1,0 +1,76 @@
+var name= ['4302-1','4302-2','4302-3','4302-4','4302-5','4302-6','4102-5'];
+function doPost(e){
+ //設定相應的欄位參數
+  var SpreadSheet = SpreadsheetApp.openById("1xc7hB2Ce6G7CEzkb3_3edvsZTKjobePC-dGpc1F0S78");
+  var sheet = SpreadSheet.getSheetByName("工作表1");
+  var lastColumn = sheet.getLastColumn();
+  var lastRow = sheet.getLastRow();
+  var sheetData = sheet.getSheetValues(1, 1, lastRow, lastColumn);
+  //設定sheet資訊
+  
+  var finnal = 0 ;
+  var who=0;
+  var message ="";
+  //認證身份，重新輸入line@ channel_access_token
+  var CHANNEL_ACCESS_TOKEN = 'h1FCepeyL3oPVHXpWkv0VA9GXupm500z1S4DdOVEdb3iXAhGL+qptPI18xC4J7v/Rx9Www8dBNa3WJiXe6S6jVwvQfHVXQ8DTIZ1/syoCM3FPpbZdS6zRy0BZJHIYlSbPEDM7ESoPB53mUXTBknhVQdB04t89/1O/w1cDnyilFU=';
+  var msg= JSON.parse(e.postData.contents);
+  //除錯用
+  Logger.log(msg);
+  console.log(msg);
+  //從接收到的訊息中取出 replyToken 和發送的訊息文字
+  var replyToken = msg.events[0].replyToken;
+  var userMessage = msg.events[0].message.text;
+  if (typeof replyToken === 'undefined') {
+    return;
+  };
+  
+  for(i=0;i<10;i++){
+    if(userMessage==name[i]+"已還清") {
+      who=Number(i);
+      finnal = 1;
+    }
+  }
+  if(finnal == 0){
+  for(i=1;i<11;i++){
+    if(userMessage==name[i-1]) {
+      who=Number(i);
+    }
+  }
+  if(who==0)return 0;
+  who--;
+  var buyer = sheetData[[0]][who];
+  buyer += 1;
+  sheet.getRange(1,Number(who)+1).setValue(Number(buyer));
+  message +="您好"+name[who]+"\n";
+  message +="您已經購買了"+buyer+"\n";
+  message +="目前應付金額"+buyer*6+"\n";
+  if(buyer%5==0){
+     message +="您已購買一定數量的蛋了"+"\n";
+     message +="建議盡快付清唷 :3"+"\n";
+     }
+  }else{
+  sheet.getRange(1,Number(who)+1).setValue(0);
+  message +="您好"+name[who]+"\n";
+  message +="您已還清所有欠款"+"\n";
+  message +="期待您再次使用本服務"+"\n";
+  }  
+  //當資料寫入完成後，回傳資訊
+  var reply_message=[{
+      'type': 'text',
+      'text': message
+    }];
+  //回傳訊息給line 並傳送給使用者
+  var url = 'https://api.line.me/v2/bot/message/reply';
+  UrlFetchApp.fetch(url, {
+      'headers': {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+    },
+    'method': 'post',
+    'payload': JSON.stringify({
+      'replyToken': replyToken,
+      'messages': reply_message,
+    }),
+  });
+  return ContentService.createTextOutput("成功");
+} 
